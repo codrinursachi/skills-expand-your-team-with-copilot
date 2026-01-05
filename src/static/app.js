@@ -571,10 +571,10 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="social-share-buttons">
         <button class="share-button" data-activity="${name}" data-platform="twitter" title="Share on Twitter">
-          <span class="share-icon">𝕏</span>
+          <span class="share-icon">🐦</span>
         </button>
         <button class="share-button" data-activity="${name}" data-platform="facebook" title="Share on Facebook">
-          <span class="share-icon">📘</span>
+          <span class="share-icon">👥</span>
         </button>
         <button class="share-button" data-activity="${name}" data-platform="email" title="Share via Email">
           <span class="share-icon">✉️</span>
@@ -665,7 +665,7 @@ document.addEventListener("DOMContentLoaded", () => {
               showMessage("Failed to copy link", "error");
             });
         } else {
-          // Fallback for older browsers
+          // Fallback for older browsers (uses deprecated execCommand)
           const textArea = document.createElement("textarea");
           textArea.value = shareUrl;
           textArea.style.position = "fixed";
