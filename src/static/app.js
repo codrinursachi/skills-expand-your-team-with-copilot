@@ -569,6 +569,20 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="social-share-buttons">
+        <button class="share-button" data-activity="${name}" data-platform="twitter" title="Share on Twitter">
+          <span class="share-icon">𝕏</span>
+        </button>
+        <button class="share-button" data-activity="${name}" data-platform="facebook" title="Share on Facebook">
+          <span class="share-icon">📘</span>
+        </button>
+        <button class="share-button" data-activity="${name}" data-platform="email" title="Share via Email">
+          <span class="share-icon">✉️</span>
+        </button>
+        <button class="share-button" data-activity="${name}" data-platform="copy" title="Copy Link">
+          <span class="share-icon">🔗</span>
+        </button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -587,7 +601,91 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", handleShare);
+    });
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Handle social sharing
+  function handleShare(event) {
+    const button = event.currentTarget;
+    const activityName = button.dataset.activity;
+    const platform = button.dataset.platform;
+    const activity = allActivities[activityName];
+
+    if (!activity) {
+      return;
+    }
+
+    // Create share URL and text
+    const pageUrl = window.location.href.split("?")[0];
+    const shareUrl = `${pageUrl}?activity=${encodeURIComponent(activityName)}`;
+    const shareText = `Check out ${activityName} at Mergington High School! ${activity.description}`;
+    const shareTitle = `${activityName} - Mergington High School Activities`;
+
+    switch (platform) {
+      case "twitter":
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText
+        )}&url=${encodeURIComponent(shareUrl)}`;
+        window.open(twitterUrl, "_blank", "width=550,height=420");
+        break;
+
+      case "facebook":
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          shareUrl
+        )}`;
+        window.open(facebookUrl, "_blank", "width=550,height=420");
+        break;
+
+      case "email":
+        const emailSubject = encodeURIComponent(shareTitle);
+        const emailBody = encodeURIComponent(
+          `${shareText}\n\nSchedule: ${formatSchedule(
+            activity
+          )}\n\nLearn more: ${shareUrl}`
+        );
+        window.location.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+        break;
+
+      case "copy":
+        // Copy link to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(shareUrl)
+            .then(() => {
+              showMessage("Link copied to clipboard!", "success");
+            })
+            .catch((err) => {
+              console.error("Failed to copy:", err);
+              showMessage("Failed to copy link", "error");
+            });
+        } else {
+          // Fallback for older browsers
+          const textArea = document.createElement("textarea");
+          textArea.value = shareUrl;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand("copy");
+            showMessage("Link copied to clipboard!", "success");
+          } catch (err) {
+            console.error("Failed to copy:", err);
+            showMessage("Failed to copy link", "error");
+          }
+          document.body.removeChild(textArea);
+        }
+        break;
+
+      default:
+        console.error("Unknown sharing platform:", platform);
+    }
   }
 
   // Event listeners for search and filter
